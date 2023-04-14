@@ -1,5 +1,23 @@
-# nginx-operator
-operator-sdk develop nginx operator
+## 参考文档
+```text
+# operator-sdk
+https://github.com/operator-framework/operator-sdk
+
+# controller gen tools
+https://github.com/kubernetes-sigs/controller-tools
+
+# controller runtime reconcile
+https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.2/pkg/reconcile
+
+# operator beat practices
+https://sdk.operatorframework.io/docs/best-practices/best-practices/
+
+# k8s slack
+https://communityinviter.com/apps/kubernetes/community
+
+# kubebuilder
+https://github.com/kubernetes-sigs/kubebuilder
+```
 
 ## operator-sdk 版本支持
 ```text
@@ -35,4 +53,10 @@ operator-sdk create api --group operator --version v1alpha1 --kind NginxOperator
 # 5. Instantiates boilerplate controller code under a new directory called controllers/ (which we will work with more under Writing a control loop)
 
 # 6. Updates main.go to add boilerplate code for starting the new controller
+```
+
+## 生成 CRD
+```shell
+# config/crd/bases/operator.example.com_nginxoperators.yaml
+make manifests
 ```
