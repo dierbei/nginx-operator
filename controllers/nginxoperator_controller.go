@@ -18,16 +18,23 @@ package controllers
 
 import (
 	"context"
-	"github.com/dierbei/nginx-operator/assets"
+	"fmt"
+	"time"
+
+	apiv2 "github.com/operator-framework/api/pkg/operators/v2"
+	"github.com/operator-framework/operator-lib/conditions"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-
+	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	operatorv1alpha1 "github.com/dierbei/nginx-operator/api/v1alpha1"
+	"github.com/dierbei/nginx-operator/assets"
 )
 
 // NginxOperatorReconciler reconciles a NginxOperator object
@@ -60,7 +67,14 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, nil
 	} else if err != nil {
 		logger.Error(err, "Error getting operator resource object")
-		return ctrl.Result{}, err
+		meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
+			Type:               "OperatorDegraded",
+			Status:             metav1.ConditionTrue,
+			Reason:             operatorv1alpha1.ReasonCRNotAvailable,
+			LastTransitionTime: metav1.NewTime(time.Now()),
+			Message:            fmt.Sprintf("unable to get operator custom resource: %s", err.Error()),
+		})
+		return ctrl.Result{}, utilerrors.NewAggregate([]error{err, r.Status().Update(ctx, operatorCR)})
 	}
 
 	deployment := &appsv1.Deployment{}
@@ -72,7 +86,14 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		deployment = assets.GetDeploymentFromFile("assets/nginx_deployment.yaml")
 	} else if err != nil {
 		logger.Error(err, "Error getting existing Nginx deployment.")
-		return ctrl.Result{}, err
+		meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
+			Type:               "OperatorDegraded",
+			Status:             metav1.ConditionTrue,
+			Reason:             operatorv1alpha1.ReasonDeploymentNotAvailable,
+			LastTransitionTime: metav1.NewTime(time.Now()),
+			Message:            fmt.Sprintf("unable to get operand deployment: %s", err.Error()),
+		})
+		return ctrl.Result{}, utilerrors.NewAggregate([]error{err, r.Status().Update(ctx, operatorCR)})
 	}
 
 	deployment.Namespace = req.Namespace
@@ -90,7 +111,40 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		err = r.Update(ctx, deployment)
 	}
 
-	return ctrl.Result{}, nil
+	if err != nil {
+		meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
+			Type:               "OperatorDegraded",
+			Status:             metav1.ConditionTrue,
+			Reason:             operatorv1alpha1.ReasonOperandDeploymentFailed,
+			LastTransitionTime: metav1.NewTime(time.Now()),
+			Message:            fmt.Sprintf("unable to update operand deployment: %s", err.Error()),
+		})
+		return ctrl.Result{}, utilerrors.NewAggregate([]error{err, r.Status().Update(ctx, operatorCR)})
+	}
+
+	meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
+		Type:               "OperatorDegraded",
+		Status:             metav1.ConditionFalse,
+		Reason:             operatorv1alpha1.ReasonSucceeded,
+		LastTransitionTime: metav1.NewTime(time.Now()),
+		Message:            "operator successfully reconciling",
+	})
+
+	condition, err := conditions.InClusterFactory{Client: r.Client}.
+		NewCondition(apiv2.ConditionType(apiv2.Upgradeable))
+
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = condition.Set(ctx, metav1.ConditionTrue,
+		conditions.WithReason("OperatorUpgradeable"),
+		conditions.WithMessage("The operator is currently upgradeable"))
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	return ctrl.Result{}, utilerrors.NewAggregate([]error{err, r.Status().Update(ctx, operatorCR)})
 }
 
 // SetupWithManager sets up the controller with the Manager.

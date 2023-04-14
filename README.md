@@ -17,6 +17,9 @@ https://communityinviter.com/apps/kubernetes/community
 
 # kubebuilder
 https://github.com/kubernetes-sigs/kubebuilder
+
+# operator advanced topics
+https://sdk.operatorframework.io/docs/building-operators/golang/advanced-topics/
 ```
 
 ## operator-sdk 版本支持
@@ -59,4 +62,14 @@ operator-sdk create api --group operator --version v1alpha1 --kind NginxOperator
 ```shell
 # config/crd/bases/operator.example.com_nginxoperators.yaml
 make manifests
+```
+
+## 生成 client
+```shell
+make generate
+```
+
+# 生成全部
+```shell
+make
 ```

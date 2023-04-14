@@ -47,7 +47,8 @@ func TestAPIs(t *testing.T) {
 
 	RunSpecsWithDefaultAndCustomReporters(t,
 		"Controller Suite",
-		[]Reporter{printer.NewlineReporter{}})
+		[]Reporter{printer.NewlineReporter{}},
+	)
 }
 
 var _ = BeforeSuite(func() {
