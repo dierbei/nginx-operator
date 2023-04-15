@@ -24,5 +24,6 @@ FROM alpine:3.14
 WORKDIR /
 COPY --from=builder /workspace/manager .
 USER 65532:65532
+ENV OPERATOR_CONDITION_NAME=OperatorDegraded
 
 ENTRYPOINT ["/manager"]
