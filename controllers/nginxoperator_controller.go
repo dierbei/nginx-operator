@@ -102,7 +102,6 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	deployment.Namespace = req.Namespace
 	deployment.Name = req.Name
-	fmt.Println(deployment)
 	if operatorCR.Spec.Replicas != nil {
 		deployment.Spec.Replicas = operatorCR.Spec.Replicas
 	}
