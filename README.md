@@ -28,9 +28,9 @@ https://prometheus.io/docs/practices/naming/
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 ```
 
-## operator-sdk 版本支持
+## docker build
 ```text
-1.24 支持 go1.18
+IMG=docker.io/sample/nginx-operator:v0.1 make docker-build
 ```
 
 ## 初始化项目结构
