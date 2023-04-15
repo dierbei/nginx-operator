@@ -30,7 +30,7 @@ https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-read
 
 ## docker build
 ```text
-IMG=docker.io/sample/nginx-operator:v0.1 make docker-build
+docker build -t docker.io/dierbei/nginx-operator:v0.1 .
 ```
 
 ## 初始化项目结构
