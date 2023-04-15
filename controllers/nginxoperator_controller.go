@@ -59,12 +59,10 @@ type NginxOperatorReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.2/pkg/reconcile
 func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	// prometheus metrics
 	metrics.ReconcilesTotal.Inc()
-
 	logger := log.FromContext(ctx)
-	operatorCR := &operatorv1alpha1.NginxOperator{}
 
+	operatorCR := &operatorv1alpha1.NginxOperator{}
 	err := r.Get(ctx, req.NamespacedName, operatorCR)
 	if err != nil && errors.IsNotFound(err) {
 		logger.Info("Operator resource object not found.")
@@ -83,7 +81,6 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	deployment := &appsv1.Deployment{}
 	create := false
-
 	err = r.Get(ctx, req.NamespacedName, deployment)
 	if err != nil && errors.IsNotFound(err) {
 		create = true
@@ -109,12 +106,12 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		deployment.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort = *operatorCR.Spec.Port
 	}
 	ctrl.SetControllerReference(operatorCR, deployment, r.Scheme)
+
 	if create {
 		err = r.Create(ctx, deployment)
 	} else {
 		err = r.Update(ctx, deployment)
 	}
-
 	if err != nil {
 		meta.SetStatusCondition(&operatorCR.Status.Conditions, metav1.Condition{
 			Type:               "OperatorDegraded",
@@ -133,6 +130,7 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		LastTransitionTime: metav1.NewTime(time.Now()),
 		Message:            "operator successfully reconciling",
 	})
+	r.Status().Update(ctx, operatorCR)
 
 	condition, err := conditions.InClusterFactory{Client: r.Client}.
 		NewCondition(apiv2.ConditionType(apiv2.Upgradeable))
