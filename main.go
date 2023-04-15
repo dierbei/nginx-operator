@@ -22,6 +22,7 @@ import (
 	"github.com/operator-framework/operator-lib/leader"
 	"os"
 
+	apiv2 "github.com/operator-framework/api/pkg/operators/v2"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -47,6 +48,8 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(operatorv1alpha1.AddToScheme(scheme))
+
+	utilruntime.Must(apiv2.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
