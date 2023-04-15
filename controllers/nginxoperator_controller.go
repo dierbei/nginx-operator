@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/dierbei/nginx-operator/controllers/metrics"
 	"time"
 
 	apiv2 "github.com/operator-framework/api/pkg/operators/v2"
@@ -58,6 +59,9 @@ type NginxOperatorReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.2/pkg/reconcile
 func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	// prometheus metrics
+	metrics.ReconcilesTotal.Inc()
+
 	logger := log.FromContext(ctx)
 	operatorCR := &operatorv1alpha1.NginxOperator{}
 

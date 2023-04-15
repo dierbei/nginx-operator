@@ -20,6 +20,12 @@ https://github.com/kubernetes-sigs/kubebuilder
 
 # operator advanced topics
 https://sdk.operatorframework.io/docs/building-operators/golang/advanced-topics/
+
+# prometheus metric name beat practices
+https://prometheus.io/docs/practices/naming/
+
+# kubernetes probes
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 ```
 
 ## operator-sdk 版本支持
