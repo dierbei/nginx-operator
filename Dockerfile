@@ -1,6 +1,6 @@
 # Build the manager binary
 FROM golang:1.18-alpine as builder
-
+RUN go env -w GOPROXY=https://goproxy.cn,direct
 WORKDIR /workspace
 # Copy the Go Modules manifests
 COPY go.mod go.mod

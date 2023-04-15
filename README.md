@@ -31,6 +31,7 @@ https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-read
 ## docker build
 ```text
 docker build -t docker.io/dierbei/nginx-operator:v0.1 .
+docker push docker.io/dierbei/nginx-operator:v0.1
 ```
 
 ## 初始化项目结构
