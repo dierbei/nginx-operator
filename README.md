@@ -29,9 +29,17 @@ https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-read
 ```
 
 ## docker build
-```text
-docker build -t docker.io/dierbei/nginx-operator:v0.1 .
+```shell
+# 构建镜像
+docker build --platform=linux/amd64 -t docker.io/dierbei/nginx-operator:v0.1 .
+# 推送镜像
 docker push docker.io/dierbei/nginx-operator:v0.1
+# 部署 (默认读取: ~/.kube/config), 需要再 bin 目录安装 kustomize
+make deploy
+# 测试
+kubectl apply -f config/samples/sample-cr.yaml
+# 卸载
+make undeploy
 ```
 
 ## 初始化项目结构

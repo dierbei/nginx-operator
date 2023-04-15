@@ -16,3 +16,4 @@
 
 .idea
 bin/manager
+bin/kustomize
