@@ -22,8 +22,6 @@ import (
 	"github.com/dierbei/nginx-operator/controllers/metrics"
 	"time"
 
-	apiv2 "github.com/operator-framework/api/pkg/operators/v2"
-	"github.com/operator-framework/operator-lib/conditions"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -132,19 +130,19 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	})
 	r.Status().Update(ctx, operatorCR)
 
-	condition, err := conditions.InClusterFactory{Client: r.Client}.
-		NewCondition(apiv2.ConditionType(apiv2.Upgradeable))
-
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	err = condition.Set(ctx, metav1.ConditionTrue,
-		conditions.WithReason("OperatorUpgradeable"),
-		conditions.WithMessage("The operator is currently upgradeable"))
-	if err != nil {
-		return ctrl.Result{}, err
-	}
+	//condition, err := conditions.InClusterFactory{Client: r.Client}.
+	//	NewCondition(apiv2.ConditionType(apiv2.Upgradeable))
+	//
+	//if err != nil {
+	//	return ctrl.Result{}, err
+	//}
+	//
+	//err = condition.Set(ctx, metav1.ConditionTrue,
+	//	conditions.WithReason("OperatorUpgradeable"),
+	//	conditions.WithMessage("The operator is currently upgradeable"))
+	//if err != nil {
+	//	return ctrl.Result{}, err
+	//}
 
 	return ctrl.Result{}, utilerrors.NewAggregate([]error{err, r.Status().Update(ctx, operatorCR)})
 }
